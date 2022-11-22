@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>
+            Live Match Tracker Demo
+        </title>
+        <link href="https://doc-cdn.docb18a2.com/cdn1101/bundles/css/bootstrap.css?v=3.111603.0" rel="stylesheet">
+        <link href="https://doc-cdn.docb18a2.com/cdn1101/bundles/css/mainCss.css?v=3.111603.0" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="theme.css">
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+            }
+            .widgets {
+                max-width: 620px;
+                width: 100%;
+            }
+            .sr-widget {
+                border: rgba(0,0,0,0.12) solid 1px;
+                margin-bottom: 24px;
+            }
+            .sr-widget-title {
+                font-weight: bold;
+                padding-bottom: 4px;
+            }
+        </style>
+          <script src="https://code.jquery.com/jquery-1.12.4.min.js">
+    </script>
+    </head>
+    <body>
+        <script>
+            var time_now = new Date();
+            var date = new Date().toISOString().slice(0, 10);
+            var list_match = []
+            // var id = 32986743;
+            var id =0;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "https://widgets.fn.sportradar.com/demolmt/en/Asia:Jakarta/gismo/sport_matches/1/"+date,
+                success: function(data) {
+                    var a = data.doc[0].data.sport.realcategories[4].tournaments;
+                    a.forEach((item) => {
+                        var b = item.matches;
+                        b.forEach((match)=>{
+                            var time_spend = match._dt.uts * 1000;
+                            var date_match = new Date(time_spend);
+                            if (time_now<= date_match){
+                                const sub = time_now.getTime() - date_match.getTime()
+                                list_match.push({id: match._id, time: date_match, countdown: sub})
+                            }
+                        })
+                    })
+                    list_match.sort((a,b)=> { return b.countdown - a.countdown})
+                    for (var i=0; i< list_match.length; i++) {
+                        const sub = list_match[i].time.getTime() - time_now.getTime();
+                        if(sub < 0 || sub > (30*60*1000)){
+                            id = list_match[i].id;
+                            break;
+                        }
+                    }
+                    (function(a,b,c,d,e,f,g,h,i){a[e]||(i=a[e]=function(){(a[e].q=a[e].q||[]).push(arguments)},i.l=1*new Date,i.o=f,
+                        g=b.createElement(c),h=b.getElementsByTagName(c)[0],g.async=1,g.src=d,g.setAttribute("n",e),h.parentNode.insertBefore(g,h)
+                        )})(window,document,"script", "https://ws-cdn001.akamaized.net/2370877a0ce04fbfdc9678dae41d4210/widgetloader", "SIR", {
+                            theme: true, // using custom theme
+                            language: "vi"
+                        });
+                    SIR("addWidget", ".sr-widget-1", "match.lmtPlus", 
+                        {showOdds:true, scoreboard: "extended", detailedScoreboard: "disable", tabsPosition: "disable",matchId: id});
+                }
+            });
+        </script>
+        <div class="widgets">
+            <div><div class="sr-widget sr-widget-1"></div></div>
+            <!-- <div class="col-lg-12" resizing-frame="" rest-height="70" style="height: 451px;">
+                <iframe class="rsiframe ng-isolate-scope" seo-region-tag="" seo-attribute-mapping="{ name: 'sportIframeName' }" allowtransparency="true" src="https://sports.188sbk.com/vi-vn/sports/select-match/programme/football?q=YZILUXVvh2vPnr3NAcFe-qCzkZ_qaI-vsaE7DBdRW3w.&amp;country=VN&amp;currency=VND&amp;tzoff=420&amp;reg=Vietnam&amp;rc=VN&amp;programme=202&amp;partnerid=18802" frameborder="0" style="border-width: 0" rel="nofollow noopener noreferer" name="iframe_kèo_nhà_cái_188bet"></iframe>
+            </div> -->
+        </div>
+    </body>
+</html>
